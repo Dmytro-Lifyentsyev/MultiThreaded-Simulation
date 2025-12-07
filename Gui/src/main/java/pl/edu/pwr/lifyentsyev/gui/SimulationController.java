@@ -11,49 +11,60 @@ import pl.edu.pwr.lifyentsyev.core.Board;
 import pl.edu.pwr.lifyentsyev.core.Creator;
 import pl.edu.pwr.lifyentsyev.core.Field;
 
+/**
+ * Kontroler widoku głównego aplikacji (JavaFX).
+ * Odpowiada za:
+ * 1. Odbieranie danych wejściowych od użytkownika (parametry symulacji).
+ * 2. Inicjalizację logiki biznesowej (Board, Creator).
+ * 3. Cykliczne odświeżanie widoku (renderowanie stanu planszy) w pętli AnimationTimer.
+ * 4. Obsługę interakcji (Start, Pauza, Wznów).
+ */
 public class SimulationController {
-    @FXML
-    private TextField inputWidth;
-    @FXML
-    private TextField inputHeight;
-    @FXML
-    private TextField inputTreasures;
-    @FXML
-    private TextField inputScavengers;
-    @FXML
-    private TextField inputShooter;
-    @FXML
-    private TextField inputBulldozer;
-    @FXML
-    private Button startButton;
-    @FXML
-    private Label lblTreasure;
-    @FXML
-    private Label lblScavenger;
-    @FXML
-    private Label lblShooter;
-    @FXML
-    private Label lblBulldozer;
-    @FXML
-    private Label lblShots;
-    @FXML
-    private Label lblKills;
-    @FXML
-    private Label lblTransformations;
-    @FXML
-    private GridPane boardGrid;
+    //Pola formularza (konfiguracja symulacji)
+    @FXML private TextField inputWidth;
+    @FXML private TextField inputHeight;
+    @FXML private TextField inputTreasures;
+    @FXML private TextField inputScavengers;
+    @FXML private TextField inputShooter;
+    @FXML private TextField inputBulldozer;
+    /** Przycisk sterujący stanem symulacji (Start/Pauza/Wznów). */
+    @FXML private Button startButton;
+    //Etykiety statystyk (wyświetlanie stanu liczników)
+    @FXML private Label lblTreasure;
+    @FXML private Label lblScavenger;
+    @FXML private Label lblShooter;
+    @FXML private Label lblBulldozer;
+    @FXML private Label lblShots;
+    @FXML private Label lblKills;
+    @FXML private Label lblTransformations;
+    /** Główny kontener siatki, w którym rysowana jest plansza. */
+    @FXML private GridPane boardGrid;
 
-    private Board board;
-    private Creator creator;
+    private Board board; /** Referencja do modelu planszy (Backend). */
+    private Creator creator; /** Referencja do Kreatora (generatora figur). */
+
+    /** * Tablica pomocnicza przechowująca referencje do etykiet wizualnych (Frontend).
+     * Pozwala na szybki dostęp do konkretnego pola widoku [x][y] bez przeszukiwania dzieci GridPane.
+     */
     private Label[][] gridLabels;
-    private AnimationTimer timer;
-    private boolean isSimulationStarted = false;
+
+    private AnimationTimer timer; /** Pętla renderowania JavaFX. */
+    private boolean isSimulationStarted = false; /** Flaga określająca, czy symulacja została już zainicjalizowana. */
 
     String baseStyle = "-fx-border-color: #cccccc; -fx-alignment: center; -fx-font-weight: bold;";
+
+    /**
+     * Główna metoda obsługująca kliknięcie przycisku akcji.
+     * Metoda działa w trybie maszyny stanów:
+     * 1. Jeśli symulacja nie ruszyła: Waliduje dane, tworzy planszę i uruchamia timer.
+     * 2. Jeśli symulacja trwa: Przełącza między stanem PAUZA a WZNÓW.
+     */
     @FXML
     public void onStartClicked(){
         if(!isSimulationStarted){
+            // ETAP 1: Walidacja i Start
             try {
+                // Parsowanie danych wejściowych
                 int width = Integer.parseInt(inputWidth.getText());
                 int height = Integer.parseInt(inputHeight.getText());
                 int treasures = Integer.parseInt(inputTreasures.getText());
@@ -79,11 +90,15 @@ public class SimulationController {
                     return;
                 }
 
+                // Inicjalizacja Backendu i Frontendu
                 initializeSimulation(width, height, treasures, scavengers, shooter, bulldozer);
 
+                // Definicja pętli renderowania (AnimationTimer)
                 this.timer = new AnimationTimer() {
                     @Override
                     public void handle(long now) {
+
+                        // 1. Aktualizacja liczników statystyk
                         lblTreasure.setText("Skarby: " + board.treasureCount.get());
                         lblScavenger.setText("Szperacze: " + board.scavengerCount.get());
                         lblShooter.setText("Strzelcy: " + board.shooterCount.get());
@@ -92,6 +107,7 @@ public class SimulationController {
                         lblKills.setText("Zabójstwa: " + board.kills.get());
                         lblTransformations.setText("Transformacje: " + board.transformations.get());
 
+                        // 2. Aktualizacja wizualna siatki
                         for(int x=0; x<width; x++){
                             for(int y=0; y<height; y++){
                                 Field field = board.getField(x, y);
@@ -128,6 +144,7 @@ public class SimulationController {
                         }
                     }
                 };
+                // Uruchomienie pętli i zablokowanie edycji ustawień
                 this.timer.start();
                 isSimulationStarted = true;
                 startButton.setText("Pauza");
@@ -142,11 +159,14 @@ public class SimulationController {
                 showError("W polach muszą być tylko liczby całkowite!");
             }
         }else{
+            //ETAP 2: Obsługa Pauzy
             if(board.isPaused()){
+                // Wznowienie
                 board.setPaused(false);
                 timer.start();
                 startButton.setText("Pauza");
             }else{
+                // Zatrzymanie
                 board.setPaused(true);
                 timer.stop();
                 startButton.setText("Start");
@@ -154,11 +174,23 @@ public class SimulationController {
         }
     }
 
+    /**
+     * Inicjalizuje obiekty logiczne i przygotowuje siatkę wizualną.
+     * @param width Szerokość planszy.
+     * @param height Wysokość planszy.
+     * @param treasures Ilość skarbów.
+     * @param scavengers Ilość Szperaczy.
+     * @param shooter Ilość Strzelców.
+     * @param bulldozer Ilość Spychaczy.
+     */
     private void initializeSimulation(int width, int height, int treasures, int scavengers, int shooter, int bulldozer){
+        // 1. Tworzenie modelu (Backend)
         board = new Board(width, height);
         creator = new Creator(board, treasures, scavengers, shooter, bulldozer);
-
+        // 2. Uruchomienie wątku Kreatora
         new Thread(creator).start();
+
+        // 3. Generowanie siatki w GUI
         boardGrid.getChildren().clear();
         gridLabels = new Label[width][height];
 
@@ -173,6 +205,10 @@ public class SimulationController {
         }
     }
 
+    /**
+     * Wyświetla okno dialogowe z komunikatem błędu.
+     * @param message Treść komunikatu do wyświetlenia użytkownikowi.
+     */
     private void showError(String message){
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Błąd danych");

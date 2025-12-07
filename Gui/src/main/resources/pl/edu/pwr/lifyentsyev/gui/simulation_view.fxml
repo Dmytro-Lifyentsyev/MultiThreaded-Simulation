@@ -17,7 +17,7 @@
 
 <AnchorPane prefHeight="570.0" prefWidth="926.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.edu.pwr.lifyentsyev.gui.SimulationController">
    <children>
-      <BorderPane layoutX="12.0" layoutY="30.0" prefHeight="453.0" prefWidth="682.0">
+      <BorderPane layoutX="12.0" layoutY="30.0" prefHeight="453.0" prefWidth="682.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <left>
             <VBox prefHeight="200.0" prefWidth="200.0" spacing="10.0" BorderPane.alignment="CENTER">
                <padding>
