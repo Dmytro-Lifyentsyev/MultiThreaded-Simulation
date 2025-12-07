@@ -30,6 +30,8 @@ public class Shooter extends  Figure {
             else
                 setDirection(current.turnLeft());
         }else if(choice==1 || choice==2) {
+            board.shotsFired.incrementAndGet();
+
             Direction current = getDirection();
             int w = board.getWidth();
             int h = board.getHeight();
@@ -52,6 +54,8 @@ public class Shooter extends  Figure {
                             victim.stop();
                             targetField.removeOccupant();
                             victim.onRemoveFromBoard();
+
+                            board.kills.incrementAndGet();
                             break;
                         }
                     }

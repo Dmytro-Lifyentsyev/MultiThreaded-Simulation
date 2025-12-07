@@ -8,32 +8,40 @@ import pl.edu.pwr.lifyentsyev.figures.Shooter;
 import java.util.Random;
 
 public class Creator implements Runnable{
-    private static final int MAX_TREASURES = 20;
-    private static final int MAX_BULLDOZER = 3;
-    private static final int MAX_SHOOTER = 5;
-    private static final int MAX_SCAVENGER = 5;
+    private final int maxTreasures;
+    private final int maxBulldozers;
+    private final int maxShooters;
+    private final int maxScavengers;
 
     private final Random random = new Random();
     private final Board board;
     private volatile boolean running = true;
 
-    public Creator(Board board) {
+    public Creator(Board board, int maxTreasures, int maxScavengers, int maxShooters, int maxBulldozers) {
         this.board = board;
+        this.maxTreasures = maxTreasures;
+        this.maxScavengers = maxScavengers;
+        this.maxShooters = maxShooters;
+        this.maxBulldozers = maxBulldozers;
     }
 
     @Override
     public void run(){
         while(running){
             try{
+                while (board.isPaused()) {
+                    Thread.sleep(100);
+                }
+
                 Thread.sleep(random.nextInt(200, 400));
 
-                if(board.treasureCount.get() < MAX_TREASURES){
+                if(board.treasureCount.get() < maxTreasures){
                     tryToSpawn('T');
-                }else if(board.bulldozerCount.get() < MAX_BULLDOZER){
+                }else if(board.bulldozerCount.get() < maxBulldozers){
                     tryToSpawn('B');
-                }else if(board.scavengerCount.get() < MAX_SCAVENGER){
+                }else if(board.scavengerCount.get() < maxScavengers){
                     tryToSpawn('S');
-                }else if(board.shooterCount.get() < MAX_SHOOTER){
+                }else if(board.shooterCount.get() < maxShooters){
                     tryToSpawn('H');
                 }
             }catch (InterruptedException e) {

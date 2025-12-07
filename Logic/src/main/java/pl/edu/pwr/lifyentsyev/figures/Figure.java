@@ -31,6 +31,10 @@ public abstract class Figure implements Runnable{
     public void run(){
         while(running){
             try{
+                while (board.isPaused()) {
+                    Thread.sleep(100);
+                }
+
                 Thread.sleep(random.nextInt(500)+500);
                 action();
             }catch (InterruptedException e) {

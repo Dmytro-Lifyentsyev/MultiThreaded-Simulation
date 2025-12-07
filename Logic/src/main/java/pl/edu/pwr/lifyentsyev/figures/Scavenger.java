@@ -42,12 +42,12 @@ public class Scavenger extends Figure{
                 if(board.getField(this.x, this.y).removeTreasure()){
                     collectedTreasures++;
                     board.treasureCount.decrementAndGet();
-                    System.out.println("Skarby: " + collectedTreasures); // Logowanie pomaga
                 }
             }
         }
         if(collectedTreasures >= 10){
             board.scavengerCount.decrementAndGet();
+            board.transformations.incrementAndGet();
 
             Shooter shooter = new Shooter(board);
             shooter.setPosition(this.x, this.y);

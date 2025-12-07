@@ -11,6 +11,9 @@ public class Board {
     public final AtomicInteger scavengerCount = new AtomicInteger(0);
     public final AtomicInteger shooterCount = new AtomicInteger(0);
     public final AtomicInteger bulldozerCount = new AtomicInteger(0);
+    public final AtomicInteger shotsFired = new AtomicInteger(0);
+    public final AtomicInteger transformations = new AtomicInteger(0);
+    public final AtomicInteger kills = new AtomicInteger(0);
 
     public Board(int width, int height) {
         this.width = width;
@@ -47,5 +50,15 @@ public class Board {
             }
             System.out.println();
         }
+    }
+
+    private volatile boolean paused = false;
+
+    public boolean isPaused() {
+        return paused;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
     }
 }
