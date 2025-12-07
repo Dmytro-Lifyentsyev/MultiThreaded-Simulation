@@ -37,21 +37,6 @@ public class Board {
     public int getWidth() {return width;}
     public int getHeight() {return height;}
 
-    public void printBoard(){
-        for(int y=0; y<height; y++){
-            for(int x=0; x<width; x++){
-                if(getField(x,y).isOccupied()){
-                    System.out.print(getField(x,y).getOccupant().getSymbol());
-                } else if (getField(x,y).hasTreasure()) {
-                    System.out.print("$");
-                } else {
-                    System.out.print(".");
-                }
-            }
-            System.out.println();
-        }
-    }
-
     private volatile boolean paused = false;
 
     public boolean isPaused() {

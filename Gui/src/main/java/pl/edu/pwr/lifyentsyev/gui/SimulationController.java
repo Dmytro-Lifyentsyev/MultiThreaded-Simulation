@@ -2,6 +2,7 @@ package pl.edu.pwr.lifyentsyev.gui;
 
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -60,6 +61,24 @@ public class SimulationController {
                 int shooter = Integer.parseInt(inputShooter.getText());
                 int bulldozer = Integer.parseInt(inputBulldozer.getText());
 
+                if(width <= 0 || height <= 0){
+                    showError("Wymiary planszy muszą być większe od 0!");
+                    return;
+                }
+
+                if(treasures < 0 || scavengers < 0 || shooter < 0 || bulldozer < 0){
+                    showError("Liczba figur i skarbów nie może być ujemna!");
+                    return;
+                }
+
+                int total_objects = scavengers + shooter + bulldozer;
+                int boardSize = width * height;
+
+                if(total_objects > boardSize || treasures > boardSize){
+                    showError("Za dużo elementów! Plansza ma tylko " + boardSize + " pól.");
+                    return;
+                }
+
                 initializeSimulation(width, height, treasures, scavengers, shooter, bulldozer);
 
                 this.timer = new AnimationTimer() {
@@ -110,12 +129,17 @@ public class SimulationController {
                     }
                 };
                 this.timer.start();
-
                 isSimulationStarted = true;
-
                 startButton.setText("Pauza");
+
+                inputWidth.setDisable(true);
+                inputHeight.setDisable(true);
+                inputScavengers.setDisable(true);
+                inputShooter.setDisable(true);
+                inputBulldozer.setDisable(true);
+                inputTreasures.setDisable(true);
             }catch(NumberFormatException e){
-                System.out.println("Błąd: Wpisz poprawne liczby!");
+                showError("W polach muszą być tylko liczby całkowite!");
             }
         }else{
             if(board.isPaused()){
@@ -147,5 +171,13 @@ public class SimulationController {
                 gridLabels[x][y] = label;
             }
         }
+    }
+
+    private void showError(String message){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Błąd danych");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

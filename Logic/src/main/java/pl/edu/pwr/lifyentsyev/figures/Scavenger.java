@@ -46,17 +46,28 @@ public class Scavenger extends Figure{
             }
         }
         if(collectedTreasures >= 10){
-            board.scavengerCount.decrementAndGet();
-            board.transformations.incrementAndGet();
+            Field currentField = board.getField(this.x, this.y);
 
-            Shooter shooter = new Shooter(board);
-            shooter.setPosition(this.x, this.y);
-            shooter.setDirection(this.getDirection());
-            board.getField(this.x, this.y).setOccupant(shooter);
-            board.shooterCount.incrementAndGet();
+            currentField.lock.lock();
+            try {
+                if(currentField.getOccupant() != this)
+                    return;
 
-            new Thread(shooter).start();
-            running = false;
+                board.scavengerCount.decrementAndGet();
+                board.transformations.incrementAndGet();
+
+                Shooter shooter = new Shooter(board);
+                shooter.setPosition(this.x, this.y);
+                shooter.setDirection(this.getDirection());
+
+                currentField.setOccupant(shooter);
+                board.shooterCount.incrementAndGet();
+
+                new Thread(shooter).start();
+                this.running = false;
+            }finally {
+                currentField.lock.unlock();
+            }
         }
     }
 }

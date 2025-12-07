@@ -72,5 +72,4 @@ public class Shooter extends  Figure {
                 setDirection(current.turnRight());
         }
     }
-
 }

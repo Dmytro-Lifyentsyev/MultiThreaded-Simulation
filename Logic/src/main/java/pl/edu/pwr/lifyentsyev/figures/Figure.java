@@ -36,6 +36,11 @@ public abstract class Figure implements Runnable{
                 }
 
                 Thread.sleep(random.nextInt(500)+500);
+
+                if (!running) {
+                    break;
+                }
+
                 action();
             }catch (InterruptedException e) {
                 running = false;
@@ -63,6 +68,10 @@ public abstract class Figure implements Runnable{
 
         currentField.lock.lock();
         try{
+            if (currentField.getOccupant() != this) {
+                return false;
+            }
+
             if(targetField.lock.tryLock()){
                 try{
                     if(targetField.isOccupied())

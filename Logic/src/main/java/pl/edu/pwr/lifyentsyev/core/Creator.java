@@ -35,14 +35,14 @@ public class Creator implements Runnable{
 
                 Thread.sleep(random.nextInt(200, 400));
 
-                if(board.treasureCount.get() < maxTreasures){
-                    tryToSpawn('T');
-                }else if(board.bulldozerCount.get() < maxBulldozers){
+                if(board.bulldozerCount.get() < maxBulldozers){
                     tryToSpawn('B');
                 }else if(board.scavengerCount.get() < maxScavengers){
                     tryToSpawn('S');
                 }else if(board.shooterCount.get() < maxShooters){
                     tryToSpawn('H');
+                }else if(board.treasureCount.get() < maxTreasures){
+                    tryToSpawn('T');
                 }
             }catch (InterruptedException e) {
                 running = false;
